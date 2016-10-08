@@ -8,13 +8,20 @@ def calc_sketchiness(lat1, lon1, lat2, lon2):
     
     dist_meters = int(distance(lat1, lon1, lat2, lon2, 'K') * 1000.0)
     
+    result = set()
+    
     for x in range(0, dist_meters, 805):
         proportion_done = 1.0 * x / dist_meters
         lat = (proportion_done * diff_lat) + lat1
         lon = (proportion_done * diff_lon) + lon1
-        print "Find danger level at %s, %s" % (lat, lon)
+        count_nearby_crimes(result, lat, lon)
     
     print "distance in meters", dist_meters
+    
+    
+def count_nearby_crimes(result, lat, lon):
+    print "Find danger level at %s, %s" % (lat, lon)
+    
     
 # borrowed from call it magic
 def distance(lat1, lon1, lat2, lon2, unit):
