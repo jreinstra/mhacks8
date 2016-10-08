@@ -81,8 +81,8 @@ def count_nearby_crimes(result_dict, lat, lon):
            {"near":
               {
                 "geometry": {"type": "Point", "coordinates": [lat, lon]},
-                "minDistance": 60,
-                "maxDistance": 100
+                "minDistance": 0,
+                "maxDistance": 805
               }
            }
        }
