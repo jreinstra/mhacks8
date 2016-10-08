@@ -3,6 +3,7 @@ from flask_pymongo import PyMongo
 import grequests
 import json
 
+
 CONFIGURATION_FILENAME = "configuration.json"
 
 GOOGLE_MAPS_BASE_URL = 'https://maps.googleapis.com/maps/api/directions/json'
@@ -66,6 +67,54 @@ def getUberData(origin_latitude, origin_longitude, destination_latitude, destina
     headers = {"Authorization" : "Token " + UBER_API_KEY}
     rs = (grequests.get(u, headers=headers) for u in urls)
     responses = grequests.map(rs)
-    print(responses)
+    fareResponse = json.loads(responses[0].content)
+    timeResponse = json.loads(responses[1].content)
+    times = getUberTimeEstimates(timeResponse, fareResponse)
+    fares = getUberFareEstimates(fareResponse)
+    intersectionTuple = filterDictionariesToUseCommonKeys(times, fares)
+    times = intersectionTuple[0]
+    fares = intersectionTuple[1]
+
+def getUberTimeEstimates(timeResponseJSON, fareResponseJSON):
+    totalTimeEstimateDictionary = {}
+    timeArray = timeResponseJSON['times']
+    fareArray = fareResponseJSON['prices']
+    for timeDictionary in timeArray:
+        product_name = timeDictionary['localized_display_name']
+        timeEstimate = timeDictionary['estimate']
+        totalTimeEstimateDictionary[product_name] = timeEstimate
+    for fareDictionary in fareArray:
+        product_name = fareDictionary['localized_display_name']
+        if product_name in totalTimeEstimateDictionary:
+            duration = fareDictionary['duration']
+            currentDuration = totalTimeEstimateDictionary[product_name]
+            currentDuration += duration
+            totalTimeEstimateDictionary[product_name] = currentDuration
+    return totalTimeEstimateDictionary
+
+def getUberFareEstimates(fareResponseJSON):
+    pricesDictionary = {}
+    fareArray = fareResponseJSON['prices']
+    for fareDictonary in fareArray:
+        product_name = fareDictonary['localized_display_name']
+        low_fare = fareDictonary['low_estimate']
+        high_fare = fareDictonary['high_estimate']
+        average_fare = (float(low_fare) + float(high_fare))/2.0
+        pricesDictionary[product_name] = average_fare
+    return pricesDictionary
 
 
+def filterDictionariesToUseCommonKeys(dict1, dict2):
+    keys_1 = set(dict1.keys())
+    keys_2 = set(dict2.keys())
+    intersection = keys_1 & keys_2
+    newDict1 = {}
+    newDict2  = {}
+    for key in intersection:
+        newDict1[key] = dict1[key]
+        newDict2[key] = dict2[key]
+    return newDict1, newDict2
+
+
+
+getUberData('37.437007', '-122.142686', '37.453263', '-122.191283')
