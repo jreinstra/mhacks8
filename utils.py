@@ -1,6 +1,6 @@
 import math
 
-from datetimeimport datetime
+from datetime import datetime
 from pymongo import MongoClient
 
 client = MongoClient()
@@ -34,7 +34,7 @@ CRIME_CATEGORIES = {
     "EMBEZZLEMENT": 0,
     "FAMILY OFFENSE": 1,
     "KIDNAPING": 8,
-    "FORGERY"; 0,
+    "FORGERY": 0,
     "SOLICITATION": 1,
     "OTHER": 1,
     "IMMIGRATION": 1,
