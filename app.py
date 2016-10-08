@@ -144,15 +144,15 @@ def getTravelTimeForGoogleMapsJSON (json, identifier):
     return timeDictionary
 
 def getUberFareEstimateURL(origin_latitude, origin_longitude, destination_latitude, destination_longitude):
-    return UBER_BASE_URL + "estimates/price"'?start_latitude=' + origin_latitude + \
-           "&start_longitude=" + origin_longitude + \
-           "&end_latitude=" + destination_latitude + \
-           "&end_longitude=" + destination_longitude + \
+    return UBER_BASE_URL + "estimates/price"'?start_latitude=' + str(origin_latitude) + \
+           "&start_longitude=" + str(origin_longitude) + \
+           "&end_latitude=" + str(destination_latitude) + \
+           "&end_longitude=" + str(destination_longitude) + \
            "&seat_count=1"
 
 def getUberTimeEstimateURL(origin_latitude, origin_longitude):
-    return UBER_BASE_URL + "estimates/time"'?start_latitude=' + origin_latitude + \
-           "&start_longitude=" + origin_longitude
+    return UBER_BASE_URL + "estimates/time"'?start_latitude=' + str(origin_latitude) + \
+           "&start_longitude=" + str(origin_longitude)
 
 def getUberData(origin_latitude, origin_longitude, destination_latitude, destination_longitude):
     urls = [getUberFareEstimateURL(origin_latitude, origin_longitude, destination_latitude, destination_longitude), \
