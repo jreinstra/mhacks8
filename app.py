@@ -36,7 +36,7 @@ app = Flask(__name__)
 getConfigurationVariables()
 mongo = PyMongo(app)
 
-@app.route('/bot')
+@app.route('/bot', methods=['GET', 'POST'])
 def tim_the_bot():
     data = request.get_json()
     print data
