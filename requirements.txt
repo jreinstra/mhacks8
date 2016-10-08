@@ -7,3 +7,5 @@ MarkupSafe==0.23
 pymongo==3.3.0
 Werkzeug==0.11.11
 googlemaps==2.4.4
+gevent==1.1.2
+grequests==0.3.0
