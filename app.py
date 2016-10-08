@@ -3,7 +3,7 @@ from flask_pymongo import PyMongo
 import grequests
 import json
 
-from utils import *
+from utils import generate_sketch_dict
 
 
 CONFIGURATION_FILENAME = "configuration.json"
