@@ -98,7 +98,7 @@ def nearby_crimes_score(result_dict, lat, lon):
             num_days_ago = (today - crime_date).days
             
             # time decay with half life of 6 months
-            time_decay = 0.5 ^ (num_days_ago / 182.5)
+            time_decay = 0.5 ** (num_days_ago / 182.5)
             
             print "num days ago:", num_days_ago, "time_decay:", time_decay
             score = CRIME_CATEGORIES[doc["OFFENSEDESCRIPTION"].split(" - ")[0]]
