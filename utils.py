@@ -19,11 +19,11 @@ CRIME_CATEGORIES = {
     "STOLEN VEHICLE": 4,
     "DANGEROUS DRUGS": 2,
     "ESCAPE": 5,
-    "OBSTRUCTING THE POLICE": 5,
-    "OBSTRUCTING JUDICIARY",
-    "ROBBERY",
-    "EXTORTION",
-    "HOMICIDE",
+    "OBSTRUCTING THE POLICE": 2,
+    "OBSTRUCTING JUDICIARY": 1,
+    "ROBBERY": 4,
+    "EXTORTION": 5,
+    "HOMICIDE": 10,
     "OUIL": 3,
     "TRAFFIC": 1,
     "DISORDERLY CONDUCT": 1,
@@ -55,7 +55,7 @@ CRIME_CATEGORIES = {
     "KIDNAPPING": 8
 }
 
-# 0.50 miles roughly equals 805
+# 0.50 miles roughly equals 805 meters
 # inputs: start lat/long and end lat/long
 def calc_sketchiness(lat1, lon1, lat2, lon2):
     diff_lat = lat2 - lat1
@@ -80,7 +80,7 @@ def count_nearby_crimes(result_dict, lat, lon):
          "loc":
            {"near":
               {
-                "geometry": {"type": "Point", "coordinates": [42.3418956,-83.0602594]},
+                "geometry": {"type": "Point", "coordinates": [lat, lon]},
                 "minDistance": 60,
                 "maxDistance": 100
               }
