@@ -43,7 +43,7 @@ def fb_auth():
 
 def buildMapsRequest(type, origin_latitude, origin_longitude, destination_latitude, destination_longitude):
     return GOOGLE_MAPS_BASE_URL + \
-    '?origin=' + origin_latitude + "," + destination_longitude + \
+    '?origin=' + origin_latitude + "," + origin_longitude + \
     "&destination=" + destination_latitude + "," + destination_longitude +\
     "&key=" + GOOGLE_MAPS_API_KEY + \
     '&alternatives=' + 'true' + \
