@@ -69,20 +69,20 @@ def calc_sketchiness(lat1, lon1, lat2, lon2):
         proportion_done = 1.0 * x / dist_meters
         lat = (proportion_done * diff_lat) + lat1
         lon = (proportion_done * diff_lon) + lon1
-        count_nearby_crimes(result, lat, lon)
+        nearby_crimes_score(result, lat, lon)
     
     print "distance in meters", dist_meters
     
     
-def count_nearby_crimes(result_dict, lat, lon):
+def nearby_crimes_score(result_dict, lat, lon):
     cursor = db.crimedata.find(
        {
          "loc":
-           {"near":
+           {"$near":
               {
-                "geometry": {"type": "Point", "coordinates": [lat, lon]},
-                "minDistance": 0,
-                "maxDistance": 805
+                "$geometry": {"type": "Point", "coordinates": [lat, lon]},
+                "$minDistance": 0,
+                "$maxDistance": 805
               }
            }
        }
