@@ -46,7 +46,7 @@ def urlsForGoogleMaps(origin_latitude, origin_longitude, destination_latitude, d
 def getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_latitude, destination_longitude):
     urls = urlsForGoogleMaps(origin_latitude, origin_longitude, destination_latitude, destination_longitude)
     rs = (grequests.get(u) for u in urls)
-    responses = grequests.imap(rs)
+    responses = grequests.map(rs)
 
 
 def getUberFareEstimateURL(origin_latitude, origin_longitude, destination_latitude, destination_longitude):
