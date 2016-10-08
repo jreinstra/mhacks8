@@ -48,6 +48,10 @@ def tim_the_bot():
                     recipient_id = messaging_event["recipient"]["id"]
                     message_text = messaging_event["message"]["text"]
 
+                    send_reply(recipient_id, message_text)
+
+    return '', 200
+
 def send_reply(recipient_id, message):
 
     params = {
