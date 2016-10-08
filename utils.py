@@ -101,7 +101,7 @@ def nearby_crimes_score(result_dict, lat, lon):
             time_decay = 0.5 ** (num_days_ago / 182.5)
             
             print "num days ago:", num_days_ago, "time_decay:", time_decay
-            score = CRIME_CATEGORIES[doc["OFFENSEDESCRIPTION"].split(" - ")[0]]
+            score = CRIME_CATEGORIES[doc["CATEGORY"].split(" - ")[0]]
             score_decay = time_decay * score
             
             print "score:", score, "score after:", score_decay
