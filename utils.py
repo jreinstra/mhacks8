@@ -1,5 +1,6 @@
 import math
 
+from datetimeimport datetime
 from pymongo import MongoClient
 
 client = MongoClient()
@@ -91,7 +92,20 @@ def nearby_crimes_score(result_dict, lat, lon):
     for doc in cursor:
         obj_id = doc["_id"]
         if not obj_id in result_dict:
-            result_dict[obj_id] = CRIME_CATEGORIES[doc["OFFENSEDESCRIPTION"].split(" - ")[0]]
+            crime_date = datetime.strptime(doc["INCIDENTDATE"], '%m/%d/%Y')
+            today = datetime.utcnow()
+            
+            num_days_ago = (today - crime_date).days
+            
+            # time decay with half life of 6 months
+            time_decay = 0.5 ^ (num_days_ago / 182.5)
+            
+            print "num days ago:", num_days_ago, "time_decay:", time_decay
+            score = CRIME_CATEGORIES[doc["OFFENSEDESCRIPTION"].split(" - ")[0]]
+            score_decay = time_decay * score
+            
+            print "score:", score, "score after:", score_decay
+            result_dict[obj_id] = score_decay
     
     
 # borrowed from call it magic
