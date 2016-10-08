@@ -6,7 +6,7 @@ import json
 CONFIGURATION_FILENAME = "configuration.json"
 
 GOOGLE_MAPS_BASE_URL = 'https://maps.googleapis.com/maps/api/directions/json'
-GOOGLE_MAPS_MODES = ["driving", "walking", "bicycling", "transit"]
+GOOGLE_MAPS_MODES = ["walking", "bicycling", "transit"]
 GOOGLE_MAPS_API_KEY = ''
 
 
@@ -18,9 +18,9 @@ def getConfigurationVariables():
 
 
 
-#app = Flask(__name__)
+app = Flask(__name__)
 getConfigurationVariables()
-#mongo = PyMongo(app)
+mongo = PyMongo(app)
 
 
 def buildMapsRequest(type, origin_latitude, origin_longitude, destination_latitude, destination_longitude):
@@ -42,6 +42,8 @@ def getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_l
     urls = urlsForGoogleMaps(origin_latitude, origin_longitude, destination_latitude, destination_longitude)
     rs = (grequests.get(u) for u in urls)
     responses = grequests.imap(rs)
+
+
 
 
 
