@@ -119,8 +119,9 @@ def calculatePriceFromGoogleMapsJSON(json, identifier):
         steps = routeDictionary['legs'][0]['steps']
         for step in steps:
             if step['travel_mode'] == 'TRANSIT':
-                if step['line']['vehicle']['type'] == 'BUS':
-                    totalPrice += BUS_PRICE
+                if 'line' in step and 'vehicle' in step['line'] and 'type' in step['line']['vehicle']:
+                    if step['line']['vehicle']['type'] == 'BUS':
+                        totalPrice += BUS_PRICE
             key = identifier + "_" + str(i)
             priceDictionary[key] = totalPrice
         i += 1
