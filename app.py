@@ -3,6 +3,8 @@ from flask_pymongo import PyMongo
 import grequests
 import json
 
+from utils import generate_sketch_dict
+
 
 CONFIGURATION_FILENAME = "configuration.json"
 
@@ -63,16 +65,19 @@ def getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_l
     # we need to assume it's in the same order as GOOGLE_MAPS_MODES
     compositeTimes = {}
     compositePrices = {}
+    compositeSketch = {}
     for response in responses:
         identifier = GOOGLE_MAPS_MODES[i]
         jsonResponse = json.loads(response.content)
         modeTimeDictionary = getTravelTimeForGoogleMapsJSON(jsonResponse, identifier)
         modePriceDictionary = calculatePriceFromGoogleMapsJSON(jsonResponse, identifier)
+        modeSketchDictionary = generate_sketch_dict(jsonResponse, identifier)
         compositeTimes.update(modeTimeDictionary)
         compositePrices.update(modePriceDictionary)
+        compositeSketch.update(modeSketchDictionary)
         i += 1
 
-    return compositeTimes, compositePrices
+    return compositeTimes, compositePrices, compositeSketch
 
 
 def calculatePriceFromGoogleMapsJSON(json, identifier):
@@ -136,6 +141,11 @@ def getUberData(origin_latitude, origin_longitude, destination_latitude, destina
     times = intersectionTuple[0]
     fares = intersectionTuple[1]
 
+    sketchDictionary = {}
+    for key in times:
+        sketchDictionary[key] = 1
+    return times, fares, sketchDictionary
+
 def getUberTimeEstimates(timeResponseJSON, fareResponseJSON):
     totalTimeEstimateDictionary = {}
     timeArray = timeResponseJSON['times']
@@ -182,7 +192,15 @@ def filterDictionariesToUseCommonKeys(dict1, dict2):
         newDict2[key] = dict2[key]
     return newDict1, newDict2
 
+def getScores(origin_latitude, origin_longitude, destination_latitude, destination_longitude):
+    google_maps_scores = getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_latitude, destination_longitude)
+    time_dictionary = google_maps_scores[0]
+    cost_dictionary = google_maps_scores[1]
+    sketch_dictionary = google_maps_scores[2]
 
+    uber_scores = getUberData(origin_latitude, origin_longitude, destination_latitude, destination_longitude)
+    time_dictionary.update(uber_scores[0])
+    cost_dictionary.update(uber_scores[1])
+    sketch_dictionary.update(uber_scores[2])
 
-x = getGoogleMapsDataFromServer('37.437007', '-122.142686', '37.453263', '-122.191283')
-print(x)
+    return time_dictionary, cost_dictionary, sketch_dictionary
