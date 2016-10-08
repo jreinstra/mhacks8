@@ -1,6 +1,7 @@
 from flask import Flask, request, abort
 from flask_pymongo import PyMongo
 import grequests
+import requests
 import json
 
 from utils import generate_sketch_dict
@@ -24,9 +25,11 @@ def getConfigurationVariables():
         global GOOGLE_MAPS_API_KEY
         global UBER_API_KEY
         global FB_VALIDATION_TOKEN
+        global FB_TOKEN
         GOOGLE_MAPS_API_KEY = dictionary['GOOGLE_MAPS_API_KEY']
         UBER_API_KEY = dictionary['UBER_API_KEY']
         FB_VALIDATION_TOKEN = dictionary['FB_VALIDATION_TOKEN']
+        FB_TOKEN = dictionary['FB_TOKEN']
 
 
 app = Flask(__name__)
@@ -34,11 +37,34 @@ getConfigurationVariables()
 mongo = PyMongo(app)
 
 @app.route('/bot')
-def fb_auth():
-    if request.args.get('hub.mode') == 'subscribe' and request.args.get('hub.verify_token') == FB_VALIDATION_TOKEN:
-        return request.args.get('hub.challenge')
-    else:
-        abort(503)
+def tim_the_bot():
+    data = request.get_json()
+    print data
+    if data["object"]  == "page":
+        for entry in data["entry"]:
+            for messaging_event in entry["messaging"]:
+                if messaging_event.get("message"):
+                    sender_id = messaging_event["sender"]["id"]
+                    recipient_id = messaging_event["recipient"]["id"]
+                    message_text = messaging_event["message"]["text"]
+
+def send_reply(recipient_id, message):
+
+    params = {
+        "access_token": FB_TOKEN
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = json.dumps({
+        "recipient": {
+            "id": recipient_id
+        },
+        "message": {
+            "text": message
+        }
+    })
+    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
 
 def buildMapsRequest(type, origin_latitude, origin_longitude, destination_latitude, destination_longitude):
