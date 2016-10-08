@@ -93,3 +93,5 @@ ENV/
 *.xml
 
 MHACKS_8_CONFIGURATION.JSON
+
+configuration.json
