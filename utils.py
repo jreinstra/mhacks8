@@ -89,9 +89,9 @@ def count_nearby_crimes(result_dict, lat, lon):
     )
     
     for doc in cursor:
-        print doc
-        
-    print "Find danger level at %s, %s" % (lat, lon)
+        obj_id = doc["_id"]
+        if not obj_id in result_dict:
+            result_dict[obj_id] = CRIME_CATEGORIES[doc["OFFENSEDESCRIPTION"].split(" - ")[0]]
     
     
 # borrowed from call it magic
