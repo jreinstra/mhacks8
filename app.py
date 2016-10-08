@@ -4,4 +4,3 @@ import grequests
 
 app = Flask(__name__)
 mongo = PyMongo(app)
-
