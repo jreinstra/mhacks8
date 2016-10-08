@@ -71,9 +71,11 @@ def calc_sketchiness(lat1, lon1, lat2, lon2):
         lat = (proportion_done * diff_lat) + lat1
         lon = (proportion_done * diff_lon) + lon1
         nearby_crimes_score(result, lat, lon)
-    
-    print "distance in meters", dist_meters
-    
+        
+    total_score = 0.0
+    for key, value in result.items():
+        total_score += value
+    return total_score
     
 def nearby_crimes_score(result_dict, lat, lon):
     cursor = db.crimedata.find(
@@ -100,11 +102,9 @@ def nearby_crimes_score(result_dict, lat, lon):
             # time decay with half life of 6 months
             time_decay = 0.5 ** (num_days_ago / 182.5)
             
-            print "num days ago:", num_days_ago, "time_decay:", time_decay
             score = CRIME_CATEGORIES[doc["CATEGORY"].split(" - ")[0]]
             score_decay = time_decay * score
             
-            print "score:", score, "score after:", score_decay
             result_dict[obj_id] = score_decay
     
     
@@ -135,4 +135,5 @@ def distance(lat1, lon1, lat2, lon2, unit):
 
 
 if __name__ == "__main__":
-    calc_sketchiness(42.3418956, -83.0602594, 42.3018956, -83.0202594)
+    print "loading sketch factor..."
+    print "sketchiness:", calc_sketchiness(42.3418956, -83.0602594, 42.3018956, -83.0202594)
