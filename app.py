@@ -22,9 +22,6 @@ def getConfigurationVariables():
         UBER_API_KEY = dictionary['UBER_API_KEY']
 
 
-
-
-
 app = Flask(__name__)
 getConfigurationVariables()
 mongo = PyMongo(app)
@@ -70,16 +67,5 @@ def getUberData(origin_latitude, origin_longitude, destination_latitude, destina
     rs = (grequests.get(u, headers=headers) for u in urls)
     responses = grequests.map(rs)
     print(responses)
-
-
-
-
-
-
-
-
-
-
-
 
 
