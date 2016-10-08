@@ -132,4 +132,7 @@ def distance(lat1, lon1, lat2, lon2, unit):
         
     return dist
 
-calc_sketchiness(39.0, -79.2, 38.0, -78)
+
+
+if __name__ == "__main__":
+    calc_sketchiness(39.0, -79.2, 38.0, -78)
