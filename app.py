@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, abort
 from flask_pymongo import PyMongo
 import grequests
 import json
@@ -21,13 +21,22 @@ def getConfigurationVariables():
         dictionary = json.load(json_data)
         global GOOGLE_MAPS_API_KEY
         global UBER_API_KEY
+        global FB_VALIDATION_TOKEN
         GOOGLE_MAPS_API_KEY = dictionary['GOOGLE_MAPS_API_KEY']
         UBER_API_KEY = dictionary['UBER_API_KEY']
+        FB_VALIDATION_TOKEN = dictionary['FB_VALIDATION_TOKEN']
 
 
 app = Flask(__name__)
 getConfigurationVariables()
 mongo = PyMongo(app)
+
+@app.route('/bot')
+def fb_auth():
+    if request.args.get('hub.mode') == 'subscribe' and request.args.get('hub.verify_token') == FB_VALIDATION_TOKEN:
+        return request.args.get('hub.challenge')
+    else:
+        abort(503)
 
 
 def buildMapsRequest(type, origin_latitude, origin_longitude, destination_latitude, destination_longitude):
