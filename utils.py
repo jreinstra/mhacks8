@@ -59,7 +59,7 @@ CRIME_CATEGORIES = {
 
 def generate_sketch_dict(routes_dict, key_prefix):
     result = {}
-    for i in range(0, len(routes_dict)):
+    for i in xrange(0, len(routes_dict['routes'])):
         route = routes_dict["routes"][i]
         sketch_dict = {}
         for step in route["legs"][0]["steps"]:
