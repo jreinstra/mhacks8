@@ -40,17 +40,20 @@ mongo = PyMongo(app)
 def tim_the_bot():
     data = request.get_json()
     print data
-    if data["object"]  == "page":
-        for entry in data["entry"]:
-            for messaging_event in entry["messaging"]:
-                if messaging_event.get("message"):
-                    sender_id = messaging_event["sender"]["id"]
-                    recipient_id = messaging_event["recipient"]["id"]
-                    message_text = messaging_event["message"]["text"]
-
-                    send_reply(recipient_id, message_text)
-
+    for sender, message in messaging_events(data):
+        print "Incoming from %s: %s" % (sender, message)
+        send_reply(sender, message)
     return '', 200
+
+def messaging_events(payload):
+
+    data = json.loads(payload)
+    messaging_event = data["entry"][0]["messaging"]
+    for event in messaging_event:
+        if "message" in event and "text" in event["message"]:
+            yield event["sender"]["id"], event["message"]["text"].encode('unicode_escape')
+        else:
+            yield event["sender"]["id"], "I can't echo this"
 
 def send_reply(recipient_id, message):
 
