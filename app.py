@@ -238,3 +238,6 @@ def getScores(origin_latitude, origin_longitude, destination_latitude, destinati
     sketch_dictionary.update(uber_scores[2])
 
     return time_dictionary, cost_dictionary, sketch_dictionary
+
+x = getScores(42.330591,-83.038573,42.337697,-83.086810)
+print(x)
