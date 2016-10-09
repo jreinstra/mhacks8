@@ -297,5 +297,6 @@ def averageDictionaries(arrayOfDictionaries):
 def main():
     scores = getScores(42.330591,-83.038573,42.337697,-83.086810)
     ranked = rank(scores)
+    print ranked
 
 main()

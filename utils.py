@@ -127,7 +127,7 @@ def nearby_crimes_score(result_dict, lat, lon, db):
               }
            }
        }
-    )
+    ).limit(500)
     print "\tloaded crime data"
     
     for doc in cursor:
