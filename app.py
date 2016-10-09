@@ -58,7 +58,17 @@ def tim_the_bot():
                     message = x['message']['text']
                     recipient_id = x['sender']['id']
                     print "Incoming from %s: %s" % (recipient_id, message)
-                    wit_process_message(recipient_id, message)
+
+                    current_user = fetch_user(recipient_id)
+                    waiting = current_user.get('waiting', False)
+
+                    if (waiting):
+                        waiting_type = current_user['waitingFor']
+                        lat,lng = geocode(message)
+                        user.update({'fbid': recipient_id}, {'waiting': False, waiting_type: {'lat': lat, 'lng': lng}})
+                        wit_process_message(recipient_id, get_past_req(recipient_id))
+                    else:
+                        wit_process_message(recipient_id, message)
                 elif x.get('message') and x['message'].get('attachments'):
                     if x['message']['attachments'][0].get('type') == 'location':
                         recipient_id = x['sender']['id']
@@ -100,11 +110,6 @@ def fb_request_location(user_id, first_name):
 
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
-def fb_send_extra_reply(recipient_id, type):
-    # EXTRA REPLY WITH UNIQUE TAGS
-    if type in LOCAL_LOC:
-    else:
-
 
 def wit_process_message(recipient_id, message):
     resp = client.message(message)
@@ -129,10 +134,12 @@ def wit_process_message(recipient_id, message):
                         start_lat = current_user['current_location']['lat']
                         start_lng = current_user['current_location']['lng']
                         fb_send_reply(recipient_id, "Calculating the safest and fastest route to: %s" % query)
+                        fb_show_typing(recipient_id)
                         # LETS GO FOR IT
                     else:
                         store_past_req(recipient_id, message)
-                        fb_send_extra_reply(recipient_id, query)
+                        store_extra_param(recipient_id, query)
+                        fb_send_reply(recipient_id, "Please enter the address for your %s" % query)
                 else:
                     # Geocode, closets to them
                     # Tell them to wait, then do the magic
@@ -144,6 +151,23 @@ def wit_process_message(recipient_id, message):
     else:
         return 'Sorry, I was unable to understand you.'
 
+def store_extra_param(fbid, type):
+    user.update({'fbid': fbid}, {'waiting': True, 'waitingFor': type})
+
+def fb_show_typing(fbid):
+    params = {"access_token": FB_TOKEN}
+    headers = {"Content-Type": "application/json"}
+    data = json.dumps({"recipient": {"id": fbid}, "sender_action":"typing_on"})
+
+    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
+
+def fb_hide_typing(fbid):
+    params = {"access_token": FB_TOKEN}
+    headers = {"Content-Type": "application/json"}
+    data = json.dumps({"recipient": {"id": fbid}, "sender_action":"typing_off"})
+
+    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
+
 def store_current_loc(fbid, lat, lng):
     user.update({'fbid': fbid}, {'current_location': {'lat': lat, 'lng': lng}})
 
@@ -152,7 +176,10 @@ def store_past_req(fbid, req):
 
 def get_past_req(fbid):
     current_user = user.find_one({'fbid': fbid})
-    return current_user.get('last_request', False)
+    last_request = current_user.get('last_request', False)
+    user.update({'fbid': fbid}, {'last_request': False})
+
+    return last_request
 
 def buildMapsRequest(type, origin_latitude, origin_longitude, destination_latitude, destination_longitude):
     return GOOGLE_MAPS_BASE_URL + \
