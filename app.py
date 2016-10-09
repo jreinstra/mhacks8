@@ -127,21 +127,25 @@ def wit_process_message(recipient_id, message):
             query_array = resp['entities'].get('local_search_query', False)
             if query_array:
                 query = query_array[0]['value'].toLowerCase()
+                start_lat = current_user['current_location']['lat']
+                start_lng = current_user['current_location']['lng']
+                first_name = current_user['first_name']
                 if query in LOCAL_LOC:
                     if query in current_user:
                         end_lat = current_user[query]['lat']
                         end_lng = current_user[query]['lng']
-                        start_lat = current_user['current_location']['lat']
-                        start_lng = current_user['current_location']['lng']
                         fb_send_reply(recipient_id, "Calculating the safest and fastest route to: %s" % query)
                         fb_show_typing(recipient_id)
+                        # Tell them to wait, then do the magic
                         # LETS GO FOR IT
                     else:
                         store_past_req(recipient_id, message)
                         store_extra_param(recipient_id, query)
                         fb_send_reply(recipient_id, "Please enter the address for your %s" % query)
                 else:
-                    # Geocode, closets to them
+                    poi_loc = findPOI(start_lat, start_lng, query)
+                    fb_send_reply(recipient_id, "Found a %s close to you %s. Calculating the safest and fastest route now!" % poi_loc['name'], first_name)
+                    fb_show_typing(recipient_id)
                     # Tell them to wait, then do the magic
         else:
             store_past_req(recipient_id, message)
