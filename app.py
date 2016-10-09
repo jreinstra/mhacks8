@@ -493,7 +493,8 @@ def geocode(address):
 def findPOI(lat, lng, poiName):
     url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=' + GOOGLE_MAPS_API_KEY + \
           "&location=" + str(lat) + "," + str(lng) + \
-          "&rankby=distance"
+          '&radius=20', + \
+          "&rankby=keyword"
     request = requests.get(url)
     results = request.json()['results']
     if len(results) > 0:
