@@ -123,12 +123,14 @@ def nearby_crimes_score(result_dict, lat, lon, db):
               }
            }
        }
-    ).limit(500)
+    ).sort({"INCIDENTDATE":-1}).limit(500)
     
     for doc in cursor:
         obj_id = doc["_id"]
         if not obj_id in result_dict:
             crime_date = datetime.strptime(doc["INCIDENTDATE"], '%m/%d/%Y')
+            print crime_date
+            raise Exception
             today = datetime.utcnow()
             
             num_days_ago = (today - crime_date).days
