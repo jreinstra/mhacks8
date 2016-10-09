@@ -86,42 +86,31 @@ def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
         print "%s: loading route %s..." % (thread_index, i)
         route = routes_dict["routes"][i]
         sketch_dict = {}
+        coordinates = []
         for step in route["legs"][0]["steps"]:
-            calc_sketchiness(
-                step["start_location"]["lat"], step["start_location"]["lng"],
-                step["end_location"]["lat"], step["end_location"]["lng"],
-                sketch_dict, db
+            coordinates.append(
+                [
+                    [step["start_location"]["lat"], step["start_location"]["lng"]],
+                    [step["end_location"]["lat"]], step["end_location"]["lng"]
+                ]
             )
+            
+        nearby_crimes_score(sketch_dict, coordinates, db)
         total_score = 0.0
         for key, val in sketch_dict.items():
             total_score += val
         result[key_prefix + str(i)] = total_score
         print "%s: route %s loaded" % (thread_index, i)
 
-
-# 0.50 miles roughly equals 805 meters
-# inputs: start lat/long and end lat/long
-def calc_sketchiness(lat1, lon1, lat2, lon2, sketch_dict, db):
-    diff_lat = lat2 - lat1
-    diff_lon = lon2 - lon1
     
-    dist_meters = int(distance(lat1, lon1, lat2, lon2, 'K') * 1000.0)
-    
-    for x in range(0, dist_meters, 805):
-        proportion_done = 1.0 * x / dist_meters
-        lat = (proportion_done * diff_lat) + lat1
-        lon = (proportion_done * diff_lon) + lon1
-        nearby_crimes_score(sketch_dict, lat, lon, db)
-
-    
-def nearby_crimes_score(result_dict, lat, lon, db):
+def nearby_crimes_score(result_dict, coordinates, db):
     print "\tloading crime data for lat/lon..."
     cursor = db.crimedata.find(
        {
          "loc":
            {"$near":
               {
-                "$geometry": {"type": "Point", "coordinates": [lat, lon]},
+                "$geometry": {"type": "MultiLineString", "coordinates": coordinates},
                 "$minDistance": 0,
                 "$maxDistance": 805
               }
@@ -145,28 +134,3 @@ def nearby_crimes_score(result_dict, lat, lon, db):
             score_decay = time_decay * score
             
             result_dict[obj_id] = score_decay
-    
-    
-# borrowed from call it magic
-def distance(lat1, lon1, lat2, lon2, unit):
-    radlat1 = math.pi * lat1 / 180
-    radlat2 = math.pi * lat2 / 180
-    radlon1 = math.pi * lon1 / 180
-    radlon2 = math.pi * lon2 / 180
-    
-    theta = lon1 - lon2
-    radtheta = math.pi * theta / 180
-    dist = math.sin(radlat1) * math.sin(radlat2) + math.cos(radlat1) * math.cos(radlat2) * math.cos(radtheta)
-    dist = math.acos(dist)
-    dist = dist * 180 / math.pi
-    dist = dist * 60 * 1.1515
-    
-    # Convert dist in mi to dist in km
-    if (unit == "K"):
-        dist = dist * 1.609344
-        
-    # Convert dist in mi to dist in nautical mi
-    if (unit == "N"):
-        dist = dist * 0.8684
-        
-    return dist
