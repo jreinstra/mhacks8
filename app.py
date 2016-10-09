@@ -267,7 +267,10 @@ def normalizeDictionary(dictionary):
     newDictionary = {}
     for key in dictionary:
         x = dictionary[key]
-        newDictionary[key] = 1 - ((maxValue - float(x)) / (maxValue - minValue))
+        if maxValue == minValue:
+            newDictionary[key] = 1
+        else:
+            newDictionary[key] = 1 - ((maxValue - float(x)) / (maxValue - minValue))
 
     return newDictionary
 
