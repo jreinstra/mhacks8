@@ -75,15 +75,12 @@ def generate_sketch_dicts(routes_dicts, key_prefixes):
 
 
 def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
-    print "%s: creating client..." % thread_index
     client = MongoClient()
     db = client.mhacks
-    print "%s: client loaded" % thread_index
     
     result = result_dicts[thread_index]
     
     for i in xrange(0, len(routes_dict['routes'])):
-        print "%s: loading route %s..." % (thread_index, i)
         route = routes_dict["routes"][i]
         sketch_dict = {}
         for step in route["legs"][0]["steps"]:
@@ -96,7 +93,6 @@ def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
         for key, val in sketch_dict.items():
             total_score += val
         result[key_prefix + str(i)] = total_score
-        print "%s: route %s loaded" % (thread_index, i)
 
 
 # 0.50 miles roughly equals 805 meters
@@ -107,7 +103,8 @@ def calc_sketchiness(lat1, lon1, lat2, lon2, sketch_dict, db):
     
     dist_meters = int(distance(lat1, lon1, lat2, lon2, 'K') * 1000.0)
     
-    for x in range(0, dist_meters, 805):
+    # check every 0.75 miles (805 * 1.5) = ~1208
+    for x in range(0, dist_meters, 1208):
         proportion_done = 1.0 * x / dist_meters
         lat = (proportion_done * diff_lat) + lat1
         lon = (proportion_done * diff_lon) + lon1
@@ -115,7 +112,6 @@ def calc_sketchiness(lat1, lon1, lat2, lon2, sketch_dict, db):
 
     
 def nearby_crimes_score(result_dict, lat, lon, db):
-    print "\tloading crime data for lat/lon..."
     cursor = db.crimedata.find(
        {
          "loc":
@@ -128,7 +124,6 @@ def nearby_crimes_score(result_dict, lat, lon, db):
            }
        }
     ).limit(500)
-    print "\tloaded crime data"
     
     for doc in cursor:
         obj_id = doc["_id"]
