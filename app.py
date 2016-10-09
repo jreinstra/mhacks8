@@ -181,9 +181,23 @@ def wit_process_message(recipient_id, message):
                     fb_send_reply(recipient_id, "Found a %s close to you %s. Calculating the safest and fastest route now!" % (poi_loc['name'], first_name))
                     fb_show_typing(recipient_id)
 
-                    scores = getScores(start_lat, start_lng, poi_loc['lat'], poi_loc['lng'])
+                    scores_response = getScores(start_lat, start_lng, poi_loc['lat'], poi_loc['lng'])
+                    scores = scores_response['scores']
+                    gmaps = scores_response['gmaps']
+
                     ranked = rank(scores)
-                    fb_send_reply(recipient_id, str(ranked))
+
+                    key_of_first = ranked[0][0]
+                    separatorIndex = key_of_first.index('_')
+                    transitMode = key_of_first[:separatorIndex]
+                    indexInGmaps = key_of_first[separatorIndex + 1:]
+
+                    summary = gmaps[transitMode]['routes'][int(indexInGmaps)]['summary']
+
+                    best_message = "Alright, %s seems like %s via %s would be the best overall." % (
+                    first_name, transitMode, summary)
+
+                    fb_send_map_reply(recipient_id, best_message, start_lat, start_lng, poi_loc['lat'], poi_loc['lng'], transitMode)
                     # Tell them to wait, then do the magic
         else:
             store_past_req(recipient_id, message)
