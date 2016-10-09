@@ -44,20 +44,19 @@ client = Wit(access_token=WIT_TOKEN)
 
 @app.route('/bot', methods=['POST'])
 def tim_the_bot():
-    data = request.get_data()
-    print data
-    for sender, message in fb_parse_messages(data):
-        print "Incoming from %s: %s" % (sender, message)
-        wit_process_message(message)
-        fb_send_reply(sender, message)
+    if request.method == 'POST':
+        payload = request.json()
+        for event in payload['entry']:
+            messaging = event['messaging']
+            for x in messaging:
+                if x.get('message') and x['message'].get('text'):
+                    message = x['message']['text']
+                    recipient_id = x['sender']['id']
+                    print "Incoming from %s: %s" % (recipient_id, message)
+                    wit_process_message(message)
+                    fb_send_reply(recipient_id, message)
     return '', 200
 
-def fb_parse_messages(payload):
-    data = json.loads(payload)
-    messaging_event = data["entry"][0]["messaging"]
-    for event in messaging_event:
-        if "message" in event and "text" in event["message"]:
-            yield event["sender"]["id"], event["message"]["text"].encode('unicode_escape')
 
 def fb_send_reply(recipient_id, message):
     params = {"access_token": FB_TOKEN}
