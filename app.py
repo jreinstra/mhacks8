@@ -64,7 +64,6 @@ def tim_the_bot():
 
     return '', 200
 
-
 def fb_send_reply(recipient_id, message):
     params = {"access_token": FB_TOKEN}
     headers = {"Content-Type": "application/json"}
@@ -323,6 +322,16 @@ def averageDictionaries(arrayOfDictionaries):
                 averagedDictionary[key] = value
 
     return averagedDictionary
+
+
+def geocode(address):
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + GOOGLE_MAPS_API_KEY + '&address=' + address
+    request = requests.get(url)
+    location = request.json()['results'][0]['geometry']['location']
+    lat = location['lat']
+    lng = location['lng']
+    return lat, lng
+
 
 # def main():
 #     # scores = getScores(42.330591,-83.038573,42.337697,-83.086810)
