@@ -66,8 +66,15 @@ def fb_send_reply(recipient_id, message):
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
 def wit_process_message(message):
-    resp = client.message(message, verbose=True)
-    return str(resp)
+    resp = client.message(message)
+    intent = resp['intent'][0]['value']
+
+    if intent == 'destination':
+        return 'Just take an uber it is the safest.'
+    elif intent == 'best_transportation':
+        return 'You should take the train, really trust me.'
+    else:
+        return 'Sorry, I was unable to understand you.'
 
 def buildMapsRequest(type, origin_latitude, origin_longitude, destination_latitude, destination_longitude):
     return GOOGLE_MAPS_BASE_URL + \
