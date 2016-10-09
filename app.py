@@ -97,16 +97,23 @@ def getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_l
     compositeTimes = {}
     compositePrices = {}
     compositeSketch = {}
+    
+    jsonResponses = []
+    identifiers = []
+    
     for response in responses:
         identifier = GOOGLE_MAPS_MODES[i]
         jsonResponse = json.loads(response.content)
         modeTimeDictionary = getTravelTimeForGoogleMapsJSON(jsonResponse, identifier)
         modePriceDictionary = calculatePriceFromGoogleMapsJSON(jsonResponse, identifier)
-       # modeSketchDictionary = generate_sketch_dict(jsonResponse, identifier)
         compositeTimes.update(modeTimeDictionary)
         compositePrices.update(modePriceDictionary)
-       # compositeSketch.update(modeSketchDictionary)
+        
+        jsonResponses.append(response)
+        identifiers.append(identifier)
         i += 1
+        
+    compositeSketch = generate_sketch_dict(jsonResponses, identifier)
 
     return compositeTimes, compositePrices, compositeSketch
 
