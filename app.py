@@ -143,7 +143,15 @@ def wit_process_message(recipient_id, message):
                         scores_response = getScores(start_lat, start_lng, end_lat, end_lng)
                         scores = scores_response['scores']
                         gmaps = scores_response['gmaps']
+
                         ranked = rank(scores)
+
+                        key_of_first = ranked[0](0)
+                        separatorIndex = key_of_first.index('_')
+                        transitMode = key_of_first[:separatorIndex]
+                        indexInGmaps = key_of_first[separatorIndex+1:]
+                        summary = gmaps[transitMode][indexInGmaps]['summary']
+
                         fb_send_reply(recipient_id, str(ranked))
                         # Tell them to wait, then do the magic
                         # LETS GO FOR IT
