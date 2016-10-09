@@ -54,7 +54,7 @@ def tim_the_bot():
                     message = x['message']['text']
                     recipient_id = x['sender']['id']
                     print "Incoming from %s: %s" % (recipient_id, message)
-                    fb_send_reply(recipient_id, wit_process_message(message))
+                    wit_process_message(recipient_id, message)
     return '', 200
 
 
@@ -65,13 +65,20 @@ def fb_send_reply(recipient_id, message):
 
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
-def wit_process_message(message):
+def fb_get_user(user_id):
+    url = "https://graph.facebook.com/v2.6/%s?fields=first_name&access_token=%s" % (user_id, FB_TOKEN)
+    r = requests.post(url)
+    return r.json()
+
+def wit_process_message(recipient_id, message):
     resp = client.message(message)
     print(resp)
     intent = None
     intent_array = resp['entities'].get('intent', False)
     if intent_array:
         intent = intent_array[0]['value']
+        print(fb_get_user(recipient_id))
+        fb_send_reply(recipient_id, "Let me check that for you, give me on sec.")
 
     if intent == 'destination':
         return 'Just take an uber it is the safest.'
