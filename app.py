@@ -1,5 +1,5 @@
 from flask import Flask, request, abort
-from flask_pymongo import PyMongo
+from pymongo import MongoClient
 from wit import Wit
 import grequests
 import requests
@@ -8,7 +8,7 @@ import json
 from utils import generate_sketch_dicts
 import operator
 
-client = PyMongo()
+client = MongoClient()
 db = client.mhacks
 user = db.user
 
@@ -42,7 +42,6 @@ def getConfigurationVariables():
 
 app = Flask(__name__)
 getConfigurationVariables()
-mongo = PyMongo(app)
 
 client = Wit(access_token=WIT_TOKEN)
 
