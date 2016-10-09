@@ -68,6 +68,7 @@ def fb_send_reply(recipient_id, message):
 def wit_process_message(message):
     resp = client.message(message)
     print(resp)
+    intent = None
     intent_array = resp['entities'].get('intent', False)
     if intent_array:
         intent = intent_array[0]['value']
