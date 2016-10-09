@@ -385,15 +385,16 @@ def rank(array):
 
 
 def normalizeDictionary(dictionary):
-    maxValue = float(max(dictionary.values()))
-    minValue = float(min(dictionary.values()))
-
-    newDictionary = {}
-    for key in dictionary:
-        x = dictionary[key]
-        if maxValue == minValue:
-            newDictionary[key] = 1
-        else:
+    values = dictionary.values()
+    maxValue = float(max(values))
+    minValue = float(min(values))
+    
+    if maxValue == minValue:
+        return {key:1 for key, value in dictionary.items()}
+    else:
+        newDictionary = {}
+        for key in dictionary:
+            x = dictionary[key]
             newDictionary[key] = 1 - ((maxValue - float(x)) / (maxValue - minValue))
 
     return newDictionary
