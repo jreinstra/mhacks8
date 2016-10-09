@@ -61,7 +61,7 @@ def tim_the_bot():
 def fb_send_reply(recipient_id, message):
     params = {"access_token": FB_TOKEN}
     headers = {"Content-Type": "application/json"}
-    data = json.dumps({"recipient": { "id": recipient_id}, "message": {"text": message}})
+    data = json.dumps({"recipient": {"id": recipient_id}, "message": {"text": message}})
 
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
@@ -69,6 +69,14 @@ def fb_get_user(user_id):
     url = "https://graph.facebook.com/v2.6/%s?fields=first_name&access_token=%s" % (user_id, FB_TOKEN)
     r = requests.get(url)
     return r.json()
+
+def fb_request_location(user_id, first_name):
+    req_loc_text = "On it %s, all I need is your current location to give you the best and safest routing" % first_name
+    params = {"access_token": FB_TOKEN}
+    headers = {"Content-Type": "application/json"}
+    data = json.dumps({"recipient": {"id": user_id}, "message": {"text": req_loc_text}, "quick_replies":[{"content_type":"location",}]})
+
+    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
 def wit_process_message(recipient_id, message):
     resp = client.message(message)
@@ -78,7 +86,8 @@ def wit_process_message(recipient_id, message):
     if intent_array:
         intent = intent_array[0]['value']
         first_name = fb_get_user(recipient_id).get('first_name', 'Human')
-        fb_send_reply(recipient_id, "Okay %s, let me check that for you, give me on sec." % first_name)
+        fb_request_location(recipient_id, first_name)
+        # fb_send_reply(recipient_id, "Okay %s, let me check that for you, give me on sec." % first_name)
 
     if intent == 'destination':
         return 'Just take an uber it is the safest.'
