@@ -59,7 +59,7 @@ def tim_the_bot():
                     if x['message']['attachments'][0].get('type') == 'location':
                         recipient_id = x['sender']['id']
                         user_lat = x['message']['attachments'][0]['payload']['coordinates']['lat']
-                        user_lon = x['message']['attachments'][0]['payload']['coordinates']['lon']
+                        user_lon = x['message']['attachments'][0]['payload']['coordinates']['long']
                         fb_send_reply(recipient_id, "I got your location %s %s" % (str(user_lat), str(user_lon)))
 
     return '', 200
