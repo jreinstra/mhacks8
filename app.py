@@ -89,7 +89,7 @@ def fetch_user(fbid):
     else:
         result = db.user.insert_one(newUser)
         print('[FETCH USER] result: %s' % str(result))
-        return result
+        return db.user.find_one({"fbid": fbid})
 
 def fb_send_reply(recipient_id, message):
     params = {"access_token": FB_TOKEN}
