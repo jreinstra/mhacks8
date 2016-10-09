@@ -283,7 +283,7 @@ def rank(array):
     normalizedCost = normalizeDictionary(cost)
     normalizedSketch = normalizeDictionary(sketch)
 
-    average = averageDictionaries([normalizedTime, normalizedCost, normalizedSketch])
+    average = averageDictionaries([(normalizedTime, (1/3)), (normalizedCost, (1/3)), (normalizedSketch, (1/3))])
 
     sortedList = sorted(average.items(), key=operator.itemgetter(1))
 
@@ -310,15 +310,15 @@ def averageDictionaries(arrayOfDictionaries):
     if (len(arrayOfDictionaries) < 1):
         return arrayOfDictionaries
     else:
-        length = float(len(arrayOfDictionaries))
-        lengthReciprocal = 1.0/length
-        for dictionary in arrayOfDictionaries:
+        for tuple in arrayOfDictionaries:
+            dictionary = tuple[0]
+            weight = tuple[1]
             for key in dictionary:
                 if key in averagedDictionary:
                     value = averagedDictionary[key]
-                    value += float(dictionary[key]) * lengthReciprocal
+                    value += float(dictionary[key]) * weight
                 else:
-                    value = float(dictionary[key]) * lengthReciprocal
+                    value = float(dictionary[key]) * weight
                 averagedDictionary[key] = value
 
     return averagedDictionary
