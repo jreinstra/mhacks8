@@ -75,8 +75,10 @@ def generate_sketch_dicts(routes_dicts, key_prefixes):
 
 
 def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
+    print "%s: creating client..." % thread_index
     client = MongoClient()
     db = client.mhacks
+    print "%s: client loaded" % thread_index
     
     result = result_dicts[thread_index]
     
