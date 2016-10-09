@@ -384,6 +384,25 @@ def geocode(address):
     lng = location['lng']
     return lat, lng
 
+def findPOI(lat, lng, poiName):
+    url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=' + GOOGLE_MAPS_API_KEY + \
+          "&location=" + str(lat) + "," + str(lng) + \
+          "&rankby=distance" + '&opennow=true'
+    request = requests.get(url)
+    results = request.json()['results']
+    if len(results) > 0:
+        firstLocation = results[0]
+        lat = firstLocation['geometry']['location']['lat']
+        lng = firstLocation['geometry']['location']['lng']
+        return {
+            'name' : firstLocation['name'],
+            'lat' : lat,
+            'lng' : lng
+        }
+    return
+        None
+
+
 
 # def main():
 #     # scores = getScores(42.330591,-83.038573,42.337697,-83.086810)
