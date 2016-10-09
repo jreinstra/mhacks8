@@ -61,13 +61,13 @@ def tim_the_bot():
 def fb_send_reply(recipient_id, message):
     params = {"access_token": FB_TOKEN}
     headers = {"Content-Type": "application/json"}
-    data = json.dumps({"recipient": { "id": recipient_id},"message": {"text": message}})
+    data = json.dumps({"recipient": { "id": recipient_id}, "message": {"text": message}})
 
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
 def fb_get_user(user_id):
     url = "https://graph.facebook.com/v2.6/%s?fields=first_name&access_token=%s" % (user_id, FB_TOKEN)
-    r = requests.post(url)
+    r = requests.get(url)
     return r.json()
 
 def wit_process_message(recipient_id, message):
