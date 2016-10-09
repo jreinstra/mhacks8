@@ -151,7 +151,7 @@ def wit_process_message(recipient_id, message):
                     if query in current_user:
                         end_lat = current_user[query]['lat']
                         end_lng = current_user[query]['lng']
-                        fb_send_reply(recipient_id, "Calculating the safest and fastest route to %s" % query)
+                        fb_send_reply(recipient_id, "Calculating the optimal route to %s" % query)
                         fb_show_typing(recipient_id)
 
                         scores_response = getScores(start_lat, start_lng, end_lat, end_lng)
