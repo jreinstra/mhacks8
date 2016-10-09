@@ -91,7 +91,7 @@ def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
             coordinates.append(
                 [
                     [step["start_location"]["lat"], step["start_location"]["lng"]],
-                    [step["end_location"]["lat"]], step["end_location"]["lng"]
+                    [step["end_location"]["lat"], step["end_location"]["lng"]]
                 ]
             )
             
