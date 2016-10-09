@@ -377,7 +377,7 @@ def rank(array):
     normalizedCost = normalizeDictionary(cost)
     normalizedSketch = normalizeDictionary(sketch)
 
-    average = averageDictionaries([(normalizedTime, (1/3)), (normalizedCost, (1/3)), (normalizedSketch, (1/3))])
+    average = averageDictionaries([(normalizedTime, (1.0/3.0)), (normalizedCost, (1.0/3.0)), (normalizedSketch, (1.0/3.0))])
 
     sortedList = sorted(average.items(), key=operator.itemgetter(1))
 
