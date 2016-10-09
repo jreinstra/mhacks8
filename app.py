@@ -170,6 +170,8 @@ def wit_process_message(recipient_id, message):
                         best_message = "Alright, %s seems like %s via %s would be the best overall." % (first_name, transitMode, summary)
                         if not transitMode.lower().startswith("uber"):
                             fb_send_map_reply(recipient_id, best_message, start_lat, start_lng, end_lat, end_lng, transitMode)
+                        else:
+                            fb_send_reply(recipient_id, best_message)
                         # Tell them to wait, then do the magic
                         # LETS GO FOR IT
                     else:
