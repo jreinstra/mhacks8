@@ -205,7 +205,7 @@ def hello():
     elng = request.args.get('elng')
     type = request.args.get('type')
 
-    main_redirect = "comgooglemaps://?saddr=%s,%s&daddr=%s,%sdirectionsmode=%s" % (slat,slng,elat,elng,type)
+    main_redirect = "comgooglemaps://?saddr=%s,%s&daddr=%s,%s&directionsmode=%s" % (slat,slng,elat,elng,type)
     return redirect(main_redirect, code=302)
 
 def store_extra_param(fbid, type):
