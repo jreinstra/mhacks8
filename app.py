@@ -45,7 +45,7 @@ client = Wit(access_token=WIT_TOKEN)
 @app.route('/bot', methods=['POST'])
 def tim_the_bot():
     if request.method == 'POST':
-        payload = request.json()
+        payload = json.loads(request.get_data())
         for event in payload['entry']:
             messaging = event['messaging']
             for x in messaging:
