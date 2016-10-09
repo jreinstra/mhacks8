@@ -237,5 +237,54 @@ def getScores(origin_latitude, origin_longitude, destination_latitude, destinati
 
     return time_dictionary, cost_dictionary, sketch_dictionary
 
-x = getScores(42.330591,-83.038573,42.337697,-83.086810)
-print(x)
+def rank(array):
+    time = array[0]
+    cost = array[1]
+    sketch = array[2]
+
+    normalizedTime = normalizeDictionary(time)
+    normalizedCost = normalizeDictionary(cost)
+    normalizedSketch = normalizeDictionary(sketch)
+
+    average = averageDictionaries([normalizedTime, normalizedCost, normalizedSketch])
+
+    sortedList = sorted(average.items(), key=operator.itemgetter(1))
+
+    return sortedList
+
+
+def normalizeDictionary(dictionary):
+    maxValue = float(max(dictionary.values()))
+    minValue = float(min(dictionary.values()))
+
+    newDictionary = {}
+    for key in dictionary:
+        x = dictionary[key]
+        newDictionary[key] = 1 - ((maxValue - float(x)) / (maxValue - minValue))
+
+    return newDictionary
+
+#precondition, should all have same keys to work properly
+def averageDictionaries(arrayOfDictionaries):
+    averagedDictionary = {}
+    if (len(arrayOfDictionaries) < 1):
+        return arrayOfDictionaries
+    else:
+        length = float(len(arrayOfDictionaries))
+        lengthReciprocal = 1.0/length
+        for dictionary in arrayOfDictionaries:
+            for key in dictionary:
+                if key in averagedDictionary:
+                    value = averagedDictionary[key]
+                    value += float(dictionary[key]) * lengthReciprocal
+                else:
+                    value = float(dictionary[key]) * lengthReciprocal
+                averagedDictionary[key] = value
+
+    return averagedDictionary
+
+def main():
+    scores = getScores(42.330591,-83.038573,42.337697,-83.086810)
+    ranked = rank(scores)
+
+main()
