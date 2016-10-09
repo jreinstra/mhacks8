@@ -430,8 +430,7 @@ def findPOI(lat, lng, poiName):
             'lat' : lat,
             'lng' : lng
         }
-    return
-        None
+    return None
 
 
 
