@@ -77,8 +77,8 @@ def wit_process_message(recipient_id, message):
     intent_array = resp['entities'].get('intent', False)
     if intent_array:
         intent = intent_array[0]['value']
-        print(fb_get_user(recipient_id))
-        fb_send_reply(recipient_id, "Let me check that for you, give me on sec.")
+        first_name = fb_get_user(recipient_id).get('first_name', 'Human')
+        fb_send_reply(recipient_id, "Okay %s, let me check that for you, give me on sec." % first_name)
 
     if intent == 'destination':
         return 'Just take an uber it is the safest.'
