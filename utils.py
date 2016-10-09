@@ -115,6 +115,7 @@ def calc_sketchiness(lat1, lon1, lat2, lon2, sketch_dict, db):
 
     
 def nearby_crimes_score(result_dict, lat, lon, db):
+    print "\tloading crime data for lat/lon..."
     cursor = db.crimedata.find(
        {
          "loc":
@@ -127,6 +128,7 @@ def nearby_crimes_score(result_dict, lat, lon, db):
            }
        }
     )
+    print "\tloaded crime data"
     
     for doc in cursor:
         obj_id = doc["_id"]
