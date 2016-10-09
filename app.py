@@ -150,7 +150,7 @@ def wit_process_message(recipient_id, message):
                         separatorIndex = key_of_first.index('_')
                         transitMode = key_of_first[:separatorIndex]
                         indexInGmaps = key_of_first[separatorIndex+1:]
-                        summary = gmaps[transitMode]['routes'][indexInGmaps]['summary']
+                        summary = gmaps[transitMode][indexInGmaps]['routes']['summary']
 
                         fb_send_reply(recipient_id, str(ranked))
                         # Tell them to wait, then do the magic
