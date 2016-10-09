@@ -139,6 +139,10 @@ def wit_process_message(recipient_id, message):
                         end_lng = current_user[query]['lng']
                         fb_send_reply(recipient_id, "Calculating the safest and fastest route to %s" % query)
                         fb_show_typing(recipient_id)
+
+                        scores = getScores(start_lat, start_lng, end_lat, end_lng)
+                        ranked = rank(scores)
+                        fb_send_reply(recipient_id, str(ranked))
                         # Tell them to wait, then do the magic
                         # LETS GO FOR IT
                     else:
@@ -149,6 +153,10 @@ def wit_process_message(recipient_id, message):
                     poi_loc = findPOI(start_lat, start_lng, query)
                     fb_send_reply(recipient_id, "Found a %s close to you %s. Calculating the safest and fastest route now!" % (poi_loc['name'], first_name))
                     fb_show_typing(recipient_id)
+
+                    scores = getScores(start_lat, start_lng, end_lat, end_lng)
+                    ranked = rank(scores)
+                    fb_send_reply(recipient_id, str(ranked))
                     # Tell them to wait, then do the magic
         else:
             store_past_req(recipient_id, message)
