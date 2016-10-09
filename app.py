@@ -64,7 +64,7 @@ def tim_the_bot():
                     if (waiting):
                         waiting_type = current_user['waitingFor']
                         lat,lng = geocode(message)
-                        db.user.update({'fbid': recipient_id}, {'waiting': False, waiting_type: {'lat': lat, 'lng': lng}})
+                        db.user.update({'fbid': recipient_id}, {'$set': {'waiting': False, waiting_type: {'lat': lat, 'lng': lng}}})
                         wit_process_message(recipient_id, get_past_req(recipient_id))
                     else:
                         wit_process_message(recipient_id, message)
@@ -157,7 +157,7 @@ def wit_process_message(recipient_id, message):
         return 'Sorry, I was unable to understand you.'
 
 def store_extra_param(fbid, type):
-    db.user.update({'fbid': fbid}, {'waiting': True, 'waitingFor': type})
+    db.user.update({'fbid': fbid}, {'$set': {'waiting': True, 'waitingFor': type}})
 
 def fb_show_typing(fbid):
     params = {"access_token": FB_TOKEN}
@@ -174,15 +174,15 @@ def fb_hide_typing(fbid):
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
 def store_current_loc(fbid, lat, lng):
-    db.user.update({'fbid': fbid}, {'current_location': {'lat': lat, 'lng': lng}})
+    db.user.update({'fbid': fbid}, {'$set': {'current_location': {'lat': lat, 'lng': lng}}})
 
 def store_past_req(fbid, req):
-    db.user.update({'fbid': fbid}, {'last_request': req})
+    db.user.update({'fbid': fbid}, {'$set': {'last_request': req}})
 
 def get_past_req(fbid):
     current_user = db.user.find_one({'fbid': fbid})
     last_request = current_user.get('last_request', False)
-    db.user.update({'fbid': fbid}, {'last_request': False})
+    db.user.update({'fbid': fbid}, {'$set': {'last_request': False}})
 
     return last_request
 
