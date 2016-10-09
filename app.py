@@ -110,7 +110,7 @@ def getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_l
         compositeTimes.update(modeTimeDictionary)
         compositePrices.update(modePriceDictionary)
         
-        jsonResponses.append(response)
+        jsonResponses.append(jsonResponse)
         identifiers.append(identifier)
         i += 1
         
