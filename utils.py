@@ -54,6 +54,13 @@ CRIME_CATEGORIES = {
     "KIDNAPPING": 8
 }
 
+TRANSIT_CATEGORIES = {
+    "DRIVING": 0.0,
+    "WALKING": 1.0,
+    "BICYCLING": 0.7,
+    "TRANSIT": 0.4
+}
+
 
 def generate_sketch_dicts(routes_dicts, key_prefixes):
     N = len(routes_dicts)
@@ -87,7 +94,7 @@ def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
             calc_sketchiness(
                 step["start_location"]["lat"], step["start_location"]["lng"],
                 step["end_location"]["lat"], step["end_location"]["lng"],
-                sketch_dict, db
+                TRANSIT_CATEGORIES[step["travel_mode"]], sketch_dict, db
             )
         total_score = 0.0
         for key, val in sketch_dict.items():
@@ -97,7 +104,7 @@ def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
 
 # 0.50 miles roughly equals 805 meters
 # inputs: start lat/long and end lat/long
-def calc_sketchiness(lat1, lon1, lat2, lon2, sketch_dict, db):
+def calc_sketchiness(lat1, lon1, lat2, lon2, travel_mode_mult, sketch_dict, db):
     diff_lat = lat2 - lat1
     diff_lon = lon2 - lon1
     
@@ -108,10 +115,10 @@ def calc_sketchiness(lat1, lon1, lat2, lon2, sketch_dict, db):
         proportion_done = 1.0 * x / dist_meters
         lat = (proportion_done * diff_lat) + lat1
         lon = (proportion_done * diff_lon) + lon1
-        nearby_crimes_score(sketch_dict, lat, lon, db)
+        nearby_crimes_score(sketch_dict, lat, lon, travel_mode_mult, db)
 
     
-def nearby_crimes_score(result_dict, lat, lon, db):
+def nearby_crimes_score(result_dict, lat, lon, travel_mode_mult, db):
     cursor = db.crimedata.find(
        {
          "loc":
@@ -123,7 +130,7 @@ def nearby_crimes_score(result_dict, lat, lon, db):
               }
            }
        }
-    ).sort({"datestamp":-1}).limit(500)
+    ).sort(["datestamp",-1]).limit(500)
     
     for doc in cursor:
         obj_id = doc["_id"]
@@ -141,7 +148,7 @@ def nearby_crimes_score(result_dict, lat, lon, db):
             score = CRIME_CATEGORIES[doc["CATEGORY"].split(" - ")[0]]
             score_decay = time_decay * score
             
-            result_dict[obj_id] = score_decay
+            result_dict[obj_id] = score_decay * travel_mode_mult
     
     
 # borrowed from call it magic
