@@ -84,10 +84,12 @@ def fetch_user(fbid):
     tehuser = user.find_one({"fbid": fbid})
 
     if (tehuser):
+        print('[FETCH USER] tehuser: %s' % str(tehuser))
         return tehuser
     else:
-        user.insert_one(newUser)
-        return newUser
+        result = user.insert_one(newUser)
+        print('[FETCH USER] result: %s' % str(result))
+        return result
 
 def fb_send_reply(recipient_id, message):
     params = {"access_token": FB_TOKEN}
