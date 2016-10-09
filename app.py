@@ -1,5 +1,6 @@
 from flask import Flask, request, abort
 from flask_pymongo import PyMongo
+from wit import Wit
 import grequests
 import requests
 import json
@@ -27,51 +28,47 @@ def getConfigurationVariables():
         global UBER_API_KEY
         global FB_VALIDATION_TOKEN
         global FB_TOKEN
+        global WIT_TOKEN
         GOOGLE_MAPS_API_KEY = dictionary['GOOGLE_MAPS_API_KEY']
         UBER_API_KEY = dictionary['UBER_API_KEY']
         FB_VALIDATION_TOKEN = dictionary['FB_VALIDATION_TOKEN']
         FB_TOKEN = dictionary['FB_TOKEN']
+        WIT_TOKEN = dictionary['WIT_TOKEN']
 
 
 app = Flask(__name__)
 getConfigurationVariables()
 mongo = PyMongo(app)
 
+client = Wit(access_token=WIT_TOKEN)
+
 @app.route('/bot', methods=['POST'])
 def tim_the_bot():
     data = request.get_data()
     print data
-    for sender, message in messaging_events(data):
+    for sender, message in fb_parse_messages(data):
         print "Incoming from %s: %s" % (sender, message)
-        send_reply(sender, message)
+        wit_process_message(message)
+        fb_send_reply(sender, message)
     return '', 200
 
-def messaging_events(payload):
-
+def fb_parse_messages(payload):
     data = json.loads(payload)
     messaging_event = data["entry"][0]["messaging"]
     for event in messaging_event:
         if "message" in event and "text" in event["message"]:
             yield event["sender"]["id"], event["message"]["text"].encode('unicode_escape')
 
-def send_reply(recipient_id, message):
+def fb_send_reply(recipient_id, message):
+    params = {"access_token": FB_TOKEN}
+    headers = {"Content-Type": "application/json"}
+    data = json.dumps({"recipient": { "id": recipient_id},"message": {"text": message}})
 
-    params = {
-        "access_token": FB_TOKEN
-    }
-    headers = {
-        "Content-Type": "application/json"
-    }
-    data = json.dumps({
-        "recipient": {
-            "id": recipient_id
-        },
-        "message": {
-            "text": message
-        }
-    })
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
+def wit_process_message(message):
+    resp = client.message(message)
+    print(str(resp))
 
 def buildMapsRequest(type, origin_latitude, origin_longitude, destination_latitude, destination_longitude):
     return GOOGLE_MAPS_BASE_URL + \
