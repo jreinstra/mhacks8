@@ -67,8 +67,11 @@ def fb_send_reply(recipient_id, message):
 
 def wit_process_message(message):
     resp = client.message(message)
-    intent = resp['intent'][0]['value']
+    intent = resp['entities']['intent'][0]['value']
+    confidence = resp['entities']['intent'][0]['confidence']
 
+    print "[DEBUG] Got %s with a confidence of: %s" % (intent, confidence)
+    
     if intent == 'destination':
         return 'Just take an uber it is the safest.'
     elif intent == 'best_transportation':
