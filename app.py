@@ -262,6 +262,7 @@ def rank(array):
 
 
 def normalizeDictionary(dictionary):
+    print ('normalize')
     maxValue = float(max(dictionary.values()))
     minValue = float(min(dictionary.values()))
 
@@ -269,6 +270,7 @@ def normalizeDictionary(dictionary):
     for key in dictionary:
         x = dictionary[key]
         if maxValue == minValue:
+            print('max + min are equal for' + key)
             newDictionary[key] = 1
         else:
             newDictionary[key] = 1 - ((maxValue - float(x)) / (maxValue - minValue))
