@@ -83,6 +83,7 @@ def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
     result = result_dicts[thread_index]
     
     for i in xrange(0, len(routes_dict['routes'])):
+        print "%s: loading route %s..." % (thread_index, i)
         route = routes_dict["routes"][i]
         sketch_dict = {}
         for step in route["legs"][0]["steps"]:
@@ -95,6 +96,7 @@ def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
         for key, val in sketch_dict.items():
             total_score += val
         result[key_prefix + str(i)] = total_score
+        print "%s: route %s loaded" % (thread_index, i)
 
 
 # 0.50 miles roughly equals 805 meters
