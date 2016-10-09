@@ -4,7 +4,7 @@ import grequests
 import requests
 import json
 
-from utils import generate_sketch_dict
+from utils import generate_sketch_dicts
 
 
 CONFIGURATION_FILENAME = "configuration.json"
@@ -113,7 +113,7 @@ def getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_l
         identifiers.append(identifier)
         i += 1
         
-    compositeSketch = generate_sketch_dict(jsonResponses, identifier)
+    compositeSketch = generate_sketch_dicts(jsonResponses, identifiers)
 
     return compositeTimes, compositePrices, compositeSketch
 
