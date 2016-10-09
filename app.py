@@ -46,7 +46,6 @@ client = Wit(access_token=WIT_TOKEN)
 def tim_the_bot():
     if request.method == 'POST':
         payload = json.loads(request.get_data())
-        print()
         print(payload)
         for event in payload['entry']:
             messaging = event['messaging']
@@ -55,7 +54,6 @@ def tim_the_bot():
                     message = x['message']['text']
                     recipient_id = x['sender']['id']
                     print "Incoming from %s: %s" % (recipient_id, message)
-                    print()
                     fb_send_reply(recipient_id, wit_process_message(message))
     return '', 200
 
@@ -68,7 +66,7 @@ def fb_send_reply(recipient_id, message):
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
 def wit_process_message(message):
-    resp = client.message(message)
+    resp = client.message(message, verbose=True)
     return str(resp)
 
 def buildMapsRequest(type, origin_latitude, origin_longitude, destination_latitude, destination_longitude):
