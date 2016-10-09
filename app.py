@@ -55,6 +55,13 @@ def tim_the_bot():
                     recipient_id = x['sender']['id']
                     print "Incoming from %s: %s" % (recipient_id, message)
                     wit_process_message(recipient_id, message)
+                elif x.get('message') and x['message'].get('attachments'):
+                    if x['message'][0].get('type') == 'location':
+                        recipient_id = x['sender']['id']
+                        user_lat = x['message'][0]['payload']['coordinates']['lat']
+                        user_lon = x['message'][0]['payload']['coordinates']['lon']
+                        fb_send_reply(recipient_id, "I got your location %s %s" % (str(user_lat), str(user_lon)))
+
     return '', 200
 
 
