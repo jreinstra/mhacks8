@@ -146,7 +146,7 @@ def wit_process_message(recipient_id, message):
 
                         ranked = rank(scores)
 
-                        key_of_first = ranked[0](0)
+                        key_of_first = ranked[0][0]
                         separatorIndex = key_of_first.index('_')
                         transitMode = key_of_first[:separatorIndex]
                         indexInGmaps = key_of_first[separatorIndex+1:]
