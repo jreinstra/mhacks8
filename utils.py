@@ -130,7 +130,7 @@ def nearby_crimes_score(result_dict, lat, lon, travel_mode_mult, db):
               }
            }
        }
-    ).limit(500) #sort([("datestamp",-1)])
+    ).limit(500)
     
     for doc in cursor:
         obj_id = doc["_id"]
