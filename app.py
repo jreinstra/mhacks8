@@ -38,7 +38,7 @@ mongo = PyMongo(app)
 
 @app.route('/bot', methods=['GET', 'POST'])
 def tim_the_bot():
-    data = request.get_json()
+    data = request.get_data()
     print data
     for sender, message in messaging_events(data):
         print "Incoming from %s: %s" % (sender, message)
