@@ -53,8 +53,7 @@ def tim_the_bot():
                     message = x['message']['text']
                     recipient_id = x['sender']['id']
                     print "Incoming from %s: %s" % (recipient_id, message)
-                    wit_process_message(message)
-                    fb_send_reply(recipient_id, message)
+                    fb_send_reply(recipient_id, wit_process_message(message))
     return '', 200
 
 
