@@ -154,7 +154,7 @@ def wit_process_message(recipient_id, message):
                     fb_send_reply(recipient_id, "Found a %s close to you %s. Calculating the safest and fastest route now!" % (poi_loc['name'], first_name))
                     fb_show_typing(recipient_id)
 
-                    scores = getScores(start_lat, start_lng, end_lat, end_lng)
+                    scores = getScores(start_lat, start_lng, poi_loc['lat'], poi_loc['lng'])
                     ranked = rank(scores)
                     fb_send_reply(recipient_id, str(ranked))
                     # Tell them to wait, then do the magic
