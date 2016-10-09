@@ -47,6 +47,7 @@ client = Wit(access_token=WIT_TOKEN)
 @app.route('/bot', methods=['POST'])
 def tim_the_bot():
     if request.method == 'POST':
+        # return '',200
         payload = json.loads(request.get_data())
         print(payload)
         for event in payload['entry']:
@@ -127,7 +128,8 @@ def wit_process_message(recipient_id, message):
         if 'current_location' in current_user:
             query_array = resp['entities'].get('local_search_query', False)
             if query_array:
-                query = query_array[0]['value'].toLowerCase()
+                query = query_array[0]['value']
+                query = query.lower()
                 start_lat = current_user['current_location']['lat']
                 start_lng = current_user['current_location']['lng']
                 first_name = current_user['first_name']
@@ -145,7 +147,7 @@ def wit_process_message(recipient_id, message):
                         fb_send_reply(recipient_id, "Please enter the address for your %s" % query)
                 else:
                     poi_loc = findPOI(start_lat, start_lng, query)
-                    fb_send_reply(recipient_id, "Found a %s close to you %s. Calculating the safest and fastest route now!" % poi_loc['name'], first_name)
+                    fb_send_reply(recipient_id, "Found a %s close to you %s. Calculating the safest and fastest route now!" % (poi_loc['name'], first_name))
                     fb_show_typing(recipient_id)
                     # Tell them to wait, then do the magic
         else:
