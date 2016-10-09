@@ -2,6 +2,7 @@ import math
 
 from datetime import datetime
 from pymongo import MongoClient
+from threading import Thread
 
 client = MongoClient()
 db = client.mhacks
@@ -57,8 +58,28 @@ CRIME_CATEGORIES = {
 }
 
 
-def generate_sketch_dict(routes_dict, key_prefix):
+def generate_sketch_dicts(routes_dicts, key_prefixes):
+    N = len(routes_dicts)
+    result_dicts = [{}] * N
+    
+    threads = []
+    for i in xrange(0, N):
+        t = Thread(target=generate_sketch_dict, args=(routes_dicts[i], key_prefixes[i], result_dicts, i))
+        threads.append(t)
+        t.start()
+        
+    for t in threads:
+        t.join()
+        
     result = {}
+    for result_dict in result_dicts:
+        result.update(result_dict)
+    return result
+
+
+def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
+    result = result_dicts[thread_index]
+    
     for i in xrange(0, len(routes_dict['routes'])):
         route = routes_dict["routes"][i]
         sketch_dict = {}
@@ -72,7 +93,6 @@ def generate_sketch_dict(routes_dict, key_prefix):
         for key, val in sketch_dict.items():
             total_score += val
         result[key_prefix + str(i)] = total_score
-    return result
 
 
 # 0.50 miles roughly equals 805 meters
