@@ -220,7 +220,6 @@ def getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_l
     # we need to assume it's in the same order as GOOGLE_MAPS_MODES
     compositeTimes = {}
     compositePrices = {}
-    compositeSketch = {}
     
     jsonResponses = []
     identifiers = []
