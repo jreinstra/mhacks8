@@ -5,6 +5,7 @@ import requests
 import json
 
 from utils import generate_sketch_dicts
+import operator
 
 
 CONFIGURATION_FILENAME = "configuration.json"
