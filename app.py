@@ -180,7 +180,7 @@ def store_past_req(fbid, req):
     db.user.update({'fbid': fbid}, {'last_request': req})
 
 def get_past_req(fbid):
-    current_user = user.find_one({'fbid': fbid})
+    current_user = db.user.find_one({'fbid': fbid})
     last_request = current_user.get('last_request', False)
     db.user.update({'fbid': fbid}, {'last_request': False})
 
