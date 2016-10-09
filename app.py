@@ -71,10 +71,23 @@ def fb_get_user(user_id):
     return r.json()
 
 def fb_request_location(user_id, first_name):
-    req_loc_text = "On it %s, all I need is your current location to give you the best and safest routing" % first_name
+    req_loc_text = "On it %s, all I need is your current location to give you the best and safest routing:" % first_name
     params = {"access_token": FB_TOKEN}
     headers = {"Content-Type": "application/json"}
-    data = json.dumps({"recipient": {"id": user_id}, "message": {"text": req_loc_text}, "quick_replies":[{"content_type":"location"}]})
+    data = json.dumps({"recipient": {"id": user_id}, "message": {"text": req_loc_text},     "quick_replies":[
+      {
+        "content_type":"text",
+        "title":"Red",
+        "payload":"DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_RED",
+        "image_url":"http://petersfantastichats.com/img/red.png"
+      },
+      {
+        "content_type":"text",
+        "title":"Green",
+        "payload":"DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_GREEN",
+        "image_url":"http://petersfantastichats.com/img/green.png"
+      }
+    ]})
 
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
