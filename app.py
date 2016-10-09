@@ -99,18 +99,17 @@ def fb_send_reply(recipient_id, message):
 
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
-def fb_send_map_reply(recipient_id, message):
+def fb_send_map_reply(recipient_id, text, slat, slng, elat, elng, type):
+    deep_link_ish = 'https://tim.joseb.me/gmaps?slat=%s&slng=%s&elat=%s&elng=%s&type=%s' % (slat, slng, elat, elng, type)
     params = {"access_token": FB_TOKEN}
     headers = {"Content-Type": "application/json"}
-    data = json.dumps({"recipient": {"id": recipient_id}, "message": {"text": message, "attachment":{"type":"image", "payload":{"url":"https://petersapparel.com/img/shirt.png"}
-    , "buttons":[
-      {
-        "type":"web_url",
-        "url":"https://petersfancyapparel.com/classic_white_tshirt",
-        "title":"View Item",
-        "webview_height_ratio": "compact"
-      }
-    ]}}})
+    data = json.dumps({"recipient": {"id": recipient_id}, "message":{"attachment":{"type":"template", "payload": {"template_type":"button", "text":text,"buttons":[
+          {
+            "type":"web_url",
+            "url":deep_link_ish,
+            "title":"Directions on Google Maps"
+          }
+        ]}}}})
 
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
@@ -166,10 +165,11 @@ def wit_process_message(recipient_id, message):
                         transitMode = key_of_first[:separatorIndex]
                         indexInGmaps = key_of_first[separatorIndex+1:]
 
-
                         summary = gmaps[transitMode]['routes'][int(indexInGmaps)]['summary']
-                        print(summary)
-                        fb_send_map_reply(recipient_id, "test")
+
+                        best_message = "Alright, %s seems like %s via %s would be the best overall." % (first_name, transitMode, summary)
+
+                        fb_send_map_reply(recipient_id, best_message, start_lat, start_lng, end_lat, end_lng, transitMode)
                         # Tell them to wait, then do the magic
                         # LETS GO FOR IT
                     else:
