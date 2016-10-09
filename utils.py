@@ -4,9 +4,6 @@ from datetime import datetime
 from pymongo import MongoClient
 from threading import Thread
 
-client = MongoClient()
-db = client.mhacks
-
 
 CRIME_CATEGORIES = {
     "MISCELLANEOUS": 1,
@@ -78,6 +75,9 @@ def generate_sketch_dicts(routes_dicts, key_prefixes):
 
 
 def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
+    client = MongoClient()
+    db = client.mhacks
+    
     result = result_dicts[thread_index]
     
     for i in xrange(0, len(routes_dict['routes'])):
@@ -87,7 +87,7 @@ def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
             calc_sketchiness(
                 step["start_location"]["lat"], step["start_location"]["lng"],
                 step["end_location"]["lat"], step["end_location"]["lng"],
-                sketch_dict
+                sketch_dict, db
             )
         total_score = 0.0
         for key, val in sketch_dict.items():
@@ -97,7 +97,7 @@ def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
 
 # 0.50 miles roughly equals 805 meters
 # inputs: start lat/long and end lat/long
-def calc_sketchiness(lat1, lon1, lat2, lon2, sketch_dict):
+def calc_sketchiness(lat1, lon1, lat2, lon2, sketch_dict, db):
     diff_lat = lat2 - lat1
     diff_lon = lon2 - lon1
     
@@ -107,10 +107,10 @@ def calc_sketchiness(lat1, lon1, lat2, lon2, sketch_dict):
         proportion_done = 1.0 * x / dist_meters
         lat = (proportion_done * diff_lat) + lat1
         lon = (proportion_done * diff_lon) + lon1
-        nearby_crimes_score(sketch_dict, lat, lon)
+        nearby_crimes_score(sketch_dict, lat, lon, db)
 
     
-def nearby_crimes_score(result_dict, lat, lon):
+def nearby_crimes_score(result_dict, lat, lon, db):
     cursor = db.crimedata.find(
        {
          "loc":
