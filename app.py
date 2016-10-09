@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, redirect
 from pymongo import MongoClient
 from wit import Wit
 import grequests
@@ -179,6 +179,17 @@ def wit_process_message(recipient_id, message):
         fb_send_reply(recipient_id, "You are welcome!")
     else:
         return 'Sorry, I was unable to understand you.'
+
+@app.route('/gmaps')
+def hello():
+    slat = request.args.get('slat')
+    slng = request.args.get('slng')
+    elat = request.args.get('elat')
+    elng = request.args.get('elng')
+    type = request.args.get('type')
+
+    main_redirect = "comgooglemaps://?saddr=%s,%s&daddr=%s,%sdirectionsmode=%s" % (slat,slng,elat,elng,type)
+    return redirect(main_redirect, code=302)
 
 def store_extra_param(fbid, type):
     db.user.update({'fbid': fbid}, {'$set': {'waiting': True, 'waitingFor': type}})
