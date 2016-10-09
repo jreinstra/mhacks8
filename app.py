@@ -8,6 +8,9 @@ import json
 from utils import generate_sketch_dicts
 import operator
 
+client = PyMongo()
+db = client.mhacks
+user = db.user
 
 CONFIGURATION_FILENAME = "configuration.json"
 
@@ -20,6 +23,7 @@ UBER_API_KEY = ''
 
 BUS_PRICE = 1.50
 
+LOCAL_LOC = ['home', 'work']
 
 def getConfigurationVariables():
     with open (CONFIGURATION_FILENAME) as json_data:
@@ -60,9 +64,21 @@ def tim_the_bot():
                         recipient_id = x['sender']['id']
                         user_lat = x['message']['attachments'][0]['payload']['coordinates']['lat']
                         user_lon = x['message']['attachments'][0]['payload']['coordinates']['long']
-                        fb_send_reply(recipient_id, "I got your location %s %s" % (str(user_lat), str(user_lon)))
+                        store_current_loc(recipient_id, user_lat, user_lon)
+                        wit_process_message(recipient_id, get_past_req(recipient_id))
 
     return '', 200
+
+
+def fetch_user(fbid):
+    newUser = {"fbid": fbid, "first_name": fb_get_user(fbid).get('first_name', 'Human')}
+    tehuser = user.find_one({"fbid": fbid})
+
+    if (tehuser):
+        return tehuser
+    else:
+        user.insert_one(newUser)
+        return newUser
 
 def fb_send_reply(recipient_id, message):
     params = {"access_token": FB_TOKEN}
@@ -84,23 +100,59 @@ def fb_request_location(user_id, first_name):
 
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
+def fb_send_extra_reply(recipient_id, type):
+    # EXTRA REPLY WITH UNIQUE TAGS
+    if type in LOCAL_LOC:
+    else:
+
+
 def wit_process_message(recipient_id, message):
     resp = client.message(message)
-    print(resp)
+
     intent = None
     intent_array = resp['entities'].get('intent', False)
     if intent_array:
         intent = intent_array[0]['value']
-        first_name = fb_get_user(recipient_id).get('first_name', 'Human')
-        fb_request_location(recipient_id, first_name)
-        # fb_send_reply(recipient_id, "Okay %s, let me check that for you, give me on sec." % first_name)
+        current_user = fetch_user(recipient_id)
+        # fb_request_location(recipient_id, first_name)
+        # # fb_send_reply(recipient_id, "Okay %s, let me check that for you, give me on sec." % first_name)
 
     if intent == 'destination':
-        return 'Just take an uber it is the safest.'
+        if 'current_location' in current_user:
+            query_array = resp['entities'].get('local_search_query', False)
+            if query_array:
+                query = query_array[0]['value'].toLowerCase()
+                if query in LOCAL_LOC:
+                    if query in current_user:
+                        end_lat = current_user[query]['lat']
+                        end_lng = current_user[query]['lng']
+                        start_lat = current_user['current_location']['lat']
+                        start_lng = current_user['current_location']['lng']
+                        fb_send_reply(recipient_id, "Calculating the safest and fastest route to: %s" % query)
+                        # LETS GO FOR IT
+                    else:
+                        store_past_req(recipient_id, message)
+                        fb_send_extra_reply(recipient_id, query)
+                else:
+                    # Geocode, closets to them
+                    # Tell them to wait, then do the magic
+        else:
+            store_past_req(recipient_id, message)
+            fb_request_location(recipient_id, current_user.get("first_name"))
     elif intent == 'best_transportation':
         return 'You should take the train, really trust me.'
     else:
         return 'Sorry, I was unable to understand you.'
+
+def store_current_loc(fbid, lat, lng):
+    user.update({'fbid': fbid}, {'current_location': {'lat': lat, 'lng': lng}})
+
+def store_past_req(fbid, req):
+    user.update({'fbid': fbid}, {'last_request': req})
+
+def get_past_req(fbid):
+    current_user = user.find_one({'fbid': fbid})
+    return current_user.get('last_request', False)
 
 def buildMapsRequest(type, origin_latitude, origin_longitude, destination_latitude, destination_longitude):
     return GOOGLE_MAPS_BASE_URL + \
