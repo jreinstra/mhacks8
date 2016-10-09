@@ -52,8 +52,6 @@ def messaging_events(payload):
     for event in messaging_event:
         if "message" in event and "text" in event["message"]:
             yield event["sender"]["id"], event["message"]["text"].encode('unicode_escape')
-        else:
-            yield event["sender"]["id"], "I can't echo this"
 
 def send_reply(recipient_id, message):
 
