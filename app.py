@@ -140,7 +140,9 @@ def wit_process_message(recipient_id, message):
                         fb_send_reply(recipient_id, "Calculating the safest and fastest route to %s" % query)
                         fb_show_typing(recipient_id)
 
-                        scores = getScores(start_lat, start_lng, end_lat, end_lng)
+                        scores_response = getScores(start_lat, start_lng, end_lat, end_lng)
+                        scores = scores_response['scores']
+                        gmaps = scores_response['gmaps']
                         ranked = rank(scores)
                         fb_send_reply(recipient_id, str(ranked))
                         # Tell them to wait, then do the magic
@@ -226,11 +228,13 @@ def getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_l
     compositePrices = {}
     
     jsonResponses = []
+    cleanedJSONResponses = {}
     identifiers = []
     
     for response in responses:
         identifier = GOOGLE_MAPS_MODES[i]
         jsonResponse = json.loads(response.content)
+        cleanedJSONResponses[identifier] = jsonResponse
         modeTimeDictionary = getTravelTimeForGoogleMapsJSON(jsonResponse, identifier)
         modePriceDictionary = calculatePriceFromGoogleMapsJSON(jsonResponse, identifier)
         compositeTimes.update(modeTimeDictionary)
@@ -242,7 +246,9 @@ def getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_l
         
     compositeSketch = generate_sketch_dicts(jsonResponses, identifiers)
 
-    return compositeTimes, compositePrices, compositeSketch
+
+    return {"scores" : (compositeTimes, compositePrices, compositeSketch),
+            "json" : cleanedJSONResponses}
 
 
 def calculatePriceFromGoogleMapsJSON(json, identifier):
@@ -359,7 +365,9 @@ def filterDictionariesToUseCommonKeys(dict1, dict2):
     return newDict1, newDict2
 
 def getScores(origin_latitude, origin_longitude, destination_latitude, destination_longitude):
-    google_maps_scores = getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_latitude, destination_longitude)
+    google_maps_response = getGoogleMapsDataFromServer(origin_latitude, origin_longitude, destination_latitude, destination_longitude)
+    google_maps_scores = google_maps_response['scores']
+
     time_dictionary = google_maps_scores[0]
     cost_dictionary = google_maps_scores[1]
     sketch_dictionary = google_maps_scores[2]
@@ -369,7 +377,9 @@ def getScores(origin_latitude, origin_longitude, destination_latitude, destinati
     cost_dictionary.update(uber_scores[1])
     sketch_dictionary.update(uber_scores[2])
 
-    return time_dictionary, cost_dictionary, sketch_dictionary
+    return {"scores" : (time_dictionary, cost_dictionary, sketch_dictionary),
+            "gmaps" : google_maps_response['json']}
+
 
 def rank(array):
     time = array[0]
