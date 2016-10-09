@@ -10,7 +10,6 @@ import operator
 
 client = MongoClient()
 db = client.mhacks
-user = db.user
 
 CONFIGURATION_FILENAME = "configuration.json"
 
@@ -59,12 +58,13 @@ def tim_the_bot():
                     print "Incoming from %s: %s" % (recipient_id, message)
 
                     current_user = fetch_user(recipient_id)
+
                     waiting = current_user.get('waiting', False)
 
                     if (waiting):
                         waiting_type = current_user['waitingFor']
                         lat,lng = geocode(message)
-                        user.update({'fbid': recipient_id}, {'waiting': False, waiting_type: {'lat': lat, 'lng': lng}})
+                        db.user.update({'fbid': recipient_id}, {'waiting': False, waiting_type: {'lat': lat, 'lng': lng}})
                         wit_process_message(recipient_id, get_past_req(recipient_id))
                     else:
                         wit_process_message(recipient_id, message)
@@ -81,13 +81,13 @@ def tim_the_bot():
 
 def fetch_user(fbid):
     newUser = {"fbid": fbid, "first_name": fb_get_user(fbid).get('first_name', 'Human')}
-    tehuser = user.find_one({"fbid": fbid})
+    tehuser = db.user.find_one({"fbid": fbid})
 
     if (tehuser):
         print('[FETCH USER] tehuser: %s' % str(tehuser))
         return tehuser
     else:
-        result = user.insert_one(newUser)
+        result = db.user.insert_one(newUser)
         print('[FETCH USER] result: %s' % str(result))
         return result
 
@@ -157,7 +157,7 @@ def wit_process_message(recipient_id, message):
         return 'Sorry, I was unable to understand you.'
 
 def store_extra_param(fbid, type):
-    user.update({'fbid': fbid}, {'waiting': True, 'waitingFor': type})
+    db.user.update({'fbid': fbid}, {'waiting': True, 'waitingFor': type})
 
 def fb_show_typing(fbid):
     params = {"access_token": FB_TOKEN}
@@ -174,15 +174,15 @@ def fb_hide_typing(fbid):
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
 
 def store_current_loc(fbid, lat, lng):
-    user.update({'fbid': fbid}, {'current_location': {'lat': lat, 'lng': lng}})
+    db.user.update({'fbid': fbid}, {'current_location': {'lat': lat, 'lng': lng}})
 
 def store_past_req(fbid, req):
-    user.update({'fbid': fbid}, {'last_request': req})
+    db.user.update({'fbid': fbid}, {'last_request': req})
 
 def get_past_req(fbid):
     current_user = user.find_one({'fbid': fbid})
     last_request = current_user.get('last_request', False)
-    user.update({'fbid': fbid}, {'last_request': False})
+    db.user.update({'fbid': fbid}, {'last_request': False})
 
     return last_request
 
