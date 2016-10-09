@@ -163,6 +163,10 @@ def wit_process_message(recipient_id, message):
             fb_request_location(recipient_id, current_user.get("first_name"))
     elif intent == 'best_transportation':
         return 'You should take the train, really trust me.'
+    elif intent == 'hello':
+        fb_send_reply(recipient_id, "Hi there!")
+    elif intent == 'thanks':
+        fb_send_reply(recipient_id, "You are welcome!")
     else:
         return 'Sorry, I was unable to understand you.'
 
