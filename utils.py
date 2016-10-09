@@ -99,7 +99,7 @@ def generate_sketch_dict(routes_dict, key_prefix, result_dicts, thread_index):
         total_score = 0.0
         for key, val in sketch_dict.items():
             total_score += val
-        result[key_prefix + str(i)] = total_score
+        result[key_prefix + "_" + str(i)] = total_score
 
 
 # 0.50 miles roughly equals 805 meters
